@@ -1,4 +1,7 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+from google import genai
+import os
 import numpy as np
 from PIL import Image
 import tensorflow as tf
@@ -13,6 +16,7 @@ from disease_info import disease_info
 from model import build_model
 
 app = Flask(__name__)
+CORS(app)
 
 # ---------- SETTINGS ----------
 
@@ -32,6 +36,21 @@ explainer = GradCAM()
 
 print("Model loaded successfully!")
 
+# ---------- GEMINI CHATBOT SETUP ----------
+
+client = genai.Client(
+    api_key="AIzaSyBcR563NtfxfR6OAMP4IW9Ey7Iv8Wa0rbU"
+)
+
+system_instruction = """
+You are Skinalyze, a dermatology-focused AI assistant.
+
+Strict Rules:
+- Only answer questions related to skin lesions or dermatology.
+- If the question is unrelated (hair, shampoo, diet, math, coding, etc.), politely refuse.
+- Never diagnose conditions.
+- Provide only educational information.
+"""
 
 
 # ---------- LOAD LABELS ----------
@@ -255,7 +274,6 @@ def predict():
     "recommendation":
         info["recommendation"],
 
-
     # NEW HEATMAP ANALYSIS DATA
 
     "highest_activation":
@@ -270,6 +288,97 @@ def predict():
     "heatmap_explanation": heatmap_explanation
 
 })
+
+# ---------- CHATBOT ROUTE ----------
+def is_skin_related(text):
+
+    keywords = [
+        "skin",
+        "lesion",
+        "rash",
+        "mole",
+        "acne",
+        "psoriasis",
+        "eczema",
+        "dermatitis",
+        "melanoma",
+        "itch",
+        "redness",
+        "pigmentation",
+        "infection",
+        "ulcer",
+        "wound",
+        "scar",
+        "follicles",
+        "fungal",
+        "bacterial",
+        "skin cancer",
+        "blister",
+        "swelling",
+        "burn",
+        "dermatology"
+    ]
+
+    text = text.lower()
+
+    return any(
+        keyword in text
+        for keyword in keywords
+    )
+
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    try:
+
+        data = request.get_json()
+
+        if not data or "message" not in data:
+            return jsonify({
+                "status": "error",
+                "message": "No message provided"
+            }), 400
+
+        user_message = data["message"]
+
+        # ---------- DOMAIN FILTER ----------
+
+        if not is_skin_related(user_message):
+
+            return jsonify({
+                "status": "success",
+                "bot_response":
+                "I specialize only in skin lesions and dermatology topics. Please ask a skin-related question."
+            })
+
+        # ---------- SYSTEM PROMPT ----------
+
+        full_prompt = (
+            system_instruction
+            + "\n\nUser: "
+            + user_message
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=full_prompt
+        )
+
+        return jsonify({
+            "status": "success",
+            "bot_response":
+                response.text
+        })
+
+    except Exception as e:
+
+        print("Chatbot error:", str(e))
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+    
 
 # ---------- RUN ----------
 
