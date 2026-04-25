@@ -5,7 +5,10 @@ import os
 import numpy as np
 from PIL import Image
 import tensorflow as tf
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 import io
 import base64
 import cv2
@@ -39,7 +42,7 @@ print("Model loaded successfully!")
 # ---------- GEMINI CHATBOT SETUP ----------
 
 client = genai.Client(
-    api_key="AIzaSyBcR563NtfxfR6OAMP4IW9Ey7Iv8Wa0rbU"
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
 system_instruction = """
