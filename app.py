@@ -296,30 +296,37 @@ def predict():
 def is_skin_related(text):
 
     keywords = [
-        "skin",
-        "lesion",
-        "rash",
-        "mole",
-        "acne",
-        "psoriasis",
-        "eczema",
-        "dermatitis",
-        "melanoma",
-        "itch",
-        "redness",
-        "pigmentation",
-        "infection",
-        "ulcer",
-        "wound",
-        "scar",
-        "follicles",
-        "fungal",
-        "bacterial",
-        "skin cancer",
-        "blister",
-        "swelling",
-        "burn",
-        "dermatology"
+        # Core dermatology terms
+        "skin", "lesion", "rash", "mole",
+        "acne", "eczema", "psoriasis",
+        "dermatitis", "melanoma",
+        "itch", "redness", "pigmentation",
+        "infection", "ulcer", "wound",
+        "scar", "fungal", "bacterial",
+        "blister", "swelling",
+        "burn", "dermatology", "follicles", 
+        "scaly", "patch", "nodules",
+        "papules", "pustules", "plaques",
+        "crusting", "peeling", "dry skin",
+
+        # All 39 skin lesions and more
+        "akne", "atopic dermatitis", "basal cell carcinoma",
+        "benign keratosis", "bullous", "chickenpox",
+        "cowpox", "dermatofibroma", "exanthems",
+        "drug eruptions", "hfmd", "hand foot mouth disease",
+        "hailey hailey disease", "alopecia", "hair loss",
+        "impetigo", "larva migrans", "leprosy",
+        "borderline leprosy", "lepromatous leprosy", "tuberculoid leprosy",
+        "lichen planus", "pigmentation disorder", "light disease",
+        "lupus", "measles", "melanocytic nevi",
+        "nevus", "molluscum contagiosum", "monkeypox",
+        "nail fungus", "onychomycosis", "pityriasis rosea",
+        "poison ivy", "porokeratosis", "actinic porokeratosis",
+        "scabies", "lyme disease", "seborrheic keratosis",
+        "systemic disease", "tinea", "ringworm",
+        "tungiasis", "urticaria", "hives",
+        "vasculitis"
+
     ]
 
     text = text.lower()
